@@ -11,6 +11,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
+    <!-- PWA Meta Tags & Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0e0d1b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ABox">
+    <link rel="apple-touch-icon" href="/images/icons/icon-192.png">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -113,6 +122,12 @@
             <button id="viewModeToggle" onclick="toggleViewMode()" class="px-2.5 py-1 rounded bg-dark-800 hover:bg-dark-700 text-slate-300 flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-mobile-screen-button text-purple-400" id="viewModeIcon"></i>
                 <span id="viewModeText">Phone View</span>
+            </button>
+
+            <!-- PWA Install Button -->
+            <button onclick="installPWA()" class="px-2.5 py-1 rounded bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-purple-600/25 transition">
+                <i class="fa-solid fa-download text-[11px]"></i>
+                <span class="hidden sm:inline">Install App</span>
             </button>
 
             <!-- Quick Account Switcher for Review -->
@@ -244,7 +259,75 @@
                 showToast('Failed to switch role', true);
             }
         }
+
+        // ================= PWA INSTALLATION & SERVICE WORKER =================
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('PWA ServiceWorker registered', reg.scope))
+                    .catch(err => console.log('PWA ServiceWorker registration failed', err));
+            });
+        }
+
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner && !sessionStorage.getItem('pwa_banner_dismissed')) {
+                banner.classList.remove('hidden');
+            }
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('Installing ABox Mobile App...');
+                    }
+                    deferredPrompt = null;
+                    dismissPwaBanner();
+                });
+            } else {
+                // If already installed or browser menu instruction
+                showToast('To install: Tap Chrome menu (⋮) and tap "Install app" or "Add to Home screen"');
+            }
+        }
+
+        function dismissPwaBanner() {
+            const banner = document.getElementById('pwaInstallBanner');
+            if (banner) banner.classList.add('hidden');
+            sessionStorage.setItem('pwa_banner_dismissed', '1');
+        }
+
+        window.addEventListener('appinstalled', () => {
+            showToast('ABox App installed successfully!');
+            dismissPwaBanner();
+        });
     </script>
+
+    <!-- Floating PWA Install Banner (Mobile view) -->
+    <div id="pwaInstallBanner" class="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 w-[92%] max-w-sm p-3.5 rounded-2xl bg-dark-850/95 border border-purple-500/50 shadow-2xl backdrop-blur-md hidden z-50 flex items-center justify-between animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div class="flex items-center gap-3">
+            <img src="/images/icons/icon-192.png" class="w-10 h-10 rounded-xl object-contain bg-dark-900 border border-purple-500/40 p-0.5">
+            <div>
+                <h4 class="text-xs font-bold text-white flex items-center gap-1.5">
+                    <span>ABox Mobile App</span>
+                    <span class="text-[9px] bg-purple-600 text-white font-black px-1 rounded">APK</span>
+                </h4>
+                <p class="text-[10px] text-purple-300/80">Install on home screen for full app view</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+            <button onclick="installPWA()" class="px-3 py-1.5 rounded-xl gradient-btn text-white text-xs font-bold shadow-md">
+                Install
+            </button>
+            <button onclick="dismissPwaBanner()" class="p-1.5 text-slate-400 hover:text-white text-xs">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
     
     @stack('scripts')
 </body>
