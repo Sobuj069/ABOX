@@ -1,6 +1,8 @@
 {
   "name": "ABox - AI Real-time Voice Changer",
   "short_name": "ABox",
+  "id": "/?source=pwa",
+  "lang": "en-US",
   "description": "Next-Gen AI Real-time Voice Changer for Calling & Gaming",
   "start_url": "/",
   "scope": "/",

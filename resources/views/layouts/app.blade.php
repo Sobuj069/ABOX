@@ -290,8 +290,11 @@
                     dismissPwaBanner();
                 });
             } else {
-                // If already installed or browser menu instruction
-                showToast('To install: Tap Chrome menu (⋮) and tap "Install app" or "Add to Home screen"');
+                if (typeof openApkModal === 'function') {
+                    openApkModal();
+                } else {
+                    showToast('To install: Tap Chrome menu (⋮) and tap "Install app" or "Add to Home screen"');
+                }
             }
         }
 

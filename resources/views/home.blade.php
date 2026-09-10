@@ -25,7 +25,13 @@
     </div>
 
     <!-- Right Controls: VIP Diamond & Menu -->
-    <div class="flex items-center gap-3">
+    <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Install App APK Button -->
+        <button onclick="openApkModal()" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25 transition group text-xs font-bold shadow-sm" title="Install Android App / Download APK">
+            <i class="fa-brands fa-android text-sm text-emerald-400 group-hover:scale-110 transition-transform"></i>
+            <span class="text-[11px]">App</span>
+        </button>
+
         <!-- VIP Diamond Button -->
         <button onclick="openVipModal()" class="relative flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 hover:border-amber-400/60 transition group">
             <i class="fa-solid fa-gem text-amber-400 text-sm group-hover:scale-110 transition-transform"></i>
@@ -517,6 +523,10 @@
                     <i class="fa-solid fa-gem text-amber-400 w-5"></i>
                     <span>VIP Plans & Credits</span>
                 </a>
+                <a href="javascript:void(0)" onclick="openApkModal(); toggleSideMenu()" class="w-full px-3 py-2.5 rounded-xl bg-gradient-to-r from-emerald-950/70 to-teal-950/70 border border-emerald-500/40 text-emerald-300 font-bold flex items-center gap-3 hover:from-emerald-900/80 hover:to-teal-900/80 shadow-md">
+                    <i class="fa-brands fa-android text-emerald-400 text-sm w-5"></i>
+                    <span>Install Mobile App / APK</span>
+                </a>
 
                 @if($user && $user->isAdmin())
                     <hr class="border-dark-700 my-2">
@@ -533,6 +543,106 @@
             <span>ABox AI Studio v2.4</span>
             <button onclick="toggleSideMenu()" class="text-slate-400 hover:text-white">
                 <i class="fa-solid fa-chevron-left"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 5. APK & PWA Install Modal -->
+<div id="apkInstallModal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 hidden flex items-center justify-center p-4 overflow-y-auto" onclick="closeApkModal()">
+    <div class="w-full max-w-md bg-dark-900 border border-purple-500/40 rounded-3xl p-5 sm:p-6 shadow-2xl relative my-auto" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div class="flex justify-between items-start pb-3 border-b border-dark-700/80">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-600/30">
+                    <i class="fa-brands fa-android text-2xl text-white"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                        <span>ABox Mobile App (APK)</span>
+                        <span class="text-[9px] bg-emerald-500 text-black font-black px-1.5 py-0.5 rounded uppercase">Android</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">Install directly on phone or export APK for imo HD</p>
+                </div>
+            </div>
+            <button onclick="closeApkModal()" class="w-8 h-8 rounded-full bg-dark-800 hover:bg-dark-700 flex items-center justify-center text-slate-400 hover:text-white transition">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Content Body -->
+        <div class="space-y-4 py-4 max-h-[70vh] overflow-y-auto pr-1">
+            
+            <!-- Option 1: Direct 1-Click App Install (Recommended) -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-dark-850 to-dark-800 border border-emerald-500/40 space-y-3">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 font-black text-xs flex items-center justify-center">1</span>
+                        <h4 class="text-sm font-bold text-emerald-300">১ ক্লিকে মোবাইল অ্যাপ ইনস্টল (PWA)</h4>
+                    </div>
+                    <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full font-bold">Best & Instant</span>
+                </div>
+                
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    কোনো আলাদা ফাইল ডাউনলোড ছাড়াই সরাসরি মোবাইলের হোমস্ক্রিনে ফুল-স্ক্রিন অ্যাপ হিসেবে ইনস্টল করুন। এটি ব্রাউজার বার ছাড়া সম্পূর্ণ নেটিভ অ্যাপের মতো কাজ করবে।
+                </p>
+
+                <!-- Install Button -->
+                <button onclick="installPWA(); closeApkModal();" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/30 transition active:scale-95">
+                    <i class="fa-solid fa-download text-sm"></i>
+                    <span>মোবাইলে ইনস্টল করুন (Install Now)</span>
+                </button>
+
+                <!-- Manual Chrome Tip -->
+                <div class="text-[11px] text-slate-400 bg-dark-900/80 p-2.5 rounded-xl border border-dark-700/60 space-y-1">
+                    <div class="font-semibold text-slate-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-info-circle text-emerald-400"></i>
+                        <span>পপ-আপ না আসলে কি করবেন?</span>
+                    </div>
+                    <p>Chrome ব্রাউজারের উপরে ডানদিকের <strong>তিনটি ডট (⋮)</strong> মেনুতে চাপুন ➜ <strong>"Install app"</strong> অথবা <strong>"Add to Home screen"</strong> চাপুন। সাথে সাথে মোবাইলে অ্যাপ চলে আসবে!</p>
+                </div>
+            </div>
+
+            <!-- Option 2: Standalone .APK File (PWABuilder) -->
+            <div class="p-4 rounded-2xl bg-dark-850/80 border border-purple-500/30 space-y-3">
+                <div class="flex justify-between items-start">
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-400 font-black text-xs flex items-center justify-center">2</span>
+                        <h4 class="text-sm font-bold text-purple-300">স্ট্যান্ডঅ্যালন .APK ফাইল ডাউনলোড</h4>
+                    </div>
+                    <span class="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-2 py-0.5 rounded-full font-bold">Offline APK</span>
+                </div>
+
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    মাইক্রোসফট PWABuilder দিয়ে এই সাইটকে সরাসরি সাইন করা Android APK ফাইলে রূপান্তর করে ডাউনলোড করতে পারবেন:
+                </p>
+
+                <a href="https://www.pwabuilder.com/reportcard?site=https%3A%2F%2Fvoicechanger.smcloudit.top" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 rounded-xl bg-purple-900/50 hover:bg-purple-800/60 border border-purple-500/50 text-purple-200 font-bold text-xs flex items-center justify-center gap-2 transition block text-center">
+                    <i class="fa-solid fa-cloud-arrow-down text-sm text-purple-300"></i>
+                    <span>PWABuilder দিয়ে .APK বিল্ড করুন</span>
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                </a>
+            </div>
+
+            <!-- Option 3: Guide for imo HD Calls -->
+            <div class="p-4 rounded-2xl bg-dark-850/60 border border-dark-700 space-y-2.5">
+                <h4 class="text-xs font-bold text-cyan-300 flex items-center gap-2">
+                    <i class="fa-solid fa-headset text-cyan-400"></i>
+                    <span>imo HD তে ভয়েস চেঞ্জ করে কথা বলার নিয়ম</span>
+                </h4>
+                <ul class="text-[11px] text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
+                    <li><strong class="text-white">ভয়েস সিলেক্ট করুন:</strong> ABox ওপেন করে আপনার পছন্দের AI Voice (যেমন: AI Male4, AI Girl2) সিলেক্ট করে <em>Apply</em> চাপুন।</li>
+                    <li><strong class="text-white">স্প্লিট স্ক্রিন বা পপ-আপ:</strong> imo HD কলে কথা বলার সময় মোবাইলে ABox ব্যাকগ্রাউন্ডে বা Floating Window মোডে ওপেন রাখুন।</li>
+                    <li><strong class="text-white">রেকর্ডিং মেসেজ পাঠানো:</strong> <em>Studio</em> ট্যাবে গিয়ে পরিবর্তিত ভয়েসে অডিও রেকর্ড করে সরাসরি imo চ্যাটে শেয়ার করুন।</li>
+                </ul>
+            </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="pt-3 border-t border-dark-700/80 flex justify-end">
+            <button onclick="closeApkModal()" class="px-4 py-1.5 rounded-xl bg-dark-800 hover:bg-dark-700 text-slate-300 font-bold text-xs transition">
+                Close
             </button>
         </div>
     </div>
@@ -764,6 +874,8 @@
     function closeAppSelectorModal() { document.getElementById('appSelectorModal').classList.add('hidden'); }
     function openVipModal() { document.getElementById('vipModal').classList.remove('hidden'); }
     function closeVipModal() { document.getElementById('vipModal').classList.add('hidden'); }
+    function openApkModal() { document.getElementById('apkInstallModal').classList.remove('hidden'); }
+    function closeApkModal() { document.getElementById('apkInstallModal').classList.add('hidden'); }
     function toggleSideMenu() { document.getElementById('sideMenuModal').classList.toggle('hidden'); }
 
     // VIP Subscription simulation
