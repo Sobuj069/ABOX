@@ -600,16 +600,20 @@
         document.getElementById('pitchDisplay').innerText = (pitchShift > 0 ? '+' : '') + pitchShift + ' st';
 
         // Play preview audio
-        playVoiceAudio(voiceId, audioUrl);
+        playVoiceAudio(voiceId, audioUrl, voiceName, pitchShift);
     }
 
     // Play Voice Preview Audio with wave animation
-    function playVoiceAudio(voiceId, audioUrl) {
+    function playVoiceAudio(voiceId, audioUrl, voiceName, pitchShift) {
         // Reset all waveform animations
         document.querySelectorAll('.voice-audio-wave').forEach(w => {
             w.classList.add('hidden');
             w.classList.remove('flex');
         });
+
+        if (window.speechSynthesis && window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+        }
 
         if (currentPlayingVoiceId === voiceId && !previewAudio.paused) {
             previewAudio.pause();
@@ -617,20 +621,17 @@
             return;
         }
 
-        previewAudio.src = audioUrl;
-        previewAudio.play().catch(e => console.log('Audio autoplay prevented'));
-        currentPlayingVoiceId = voiceId;
-
         const card = document.getElementById(`voice-card-${voiceId}`);
-        if (card) {
-            const wave = card.querySelector('.voice-audio-wave');
-            if (wave) {
-                wave.classList.remove('hidden');
-                wave.classList.add('flex');
+        const showWave = () => {
+            if (card) {
+                const wave = card.querySelector('.voice-audio-wave');
+                if (wave) {
+                    wave.classList.remove('hidden');
+                    wave.classList.add('flex');
+                }
             }
-        }
-
-        previewAudio.onended = () => {
+        };
+        const hideWave = () => {
             if (card) {
                 const wave = card.querySelector('.voice-audio-wave');
                 if (wave) {
@@ -640,6 +641,30 @@
             }
             currentPlayingVoiceId = null;
         };
+
+        currentPlayingVoiceId = voiceId;
+        showWave();
+
+        // Fresh audio preview
+        previewAudio.src = audioUrl + '?t=' + Date.now();
+        previewAudio.play().then(() => {
+            // Spoken WAV preview playing successfully
+        }).catch(e => {
+            console.log('Audio element play error, using browser TTS speech', e);
+            if ('speechSynthesis' in window) {
+                const utter = new SpeechSynthesisUtterance(`Hello, I am ${voiceName}. How can I help you today?`);
+                utter.pitch = Math.max(0.4, Math.min(2.0, 1.0 + (pitchShift / 10)));
+                utter.rate = pitchShift > 2 ? 1.1 : (pitchShift < -2 ? 0.85 : 1.0);
+                utter.onend = hideWave;
+                utter.onerror = hideWave;
+                window.speechSynthesis.speak(utter);
+            } else {
+                hideWave();
+            }
+        });
+
+        previewAudio.onended = hideWave;
+        previewAudio.onerror = hideWave;
     }
 
     // Apply Selected Voice
