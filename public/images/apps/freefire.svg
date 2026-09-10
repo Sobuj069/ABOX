@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100%" height="100%">
+  <defs>
+    <linearGradient id="ffGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff7b00"/>
+      <stop offset="100%" stop-color="#b91c1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="100" height="100" rx="22" fill="#18181b"/>
+  <circle cx="50" cy="50" r="38" fill="url(#ffGrad)"/>
+  <path d="M 50 18 C 50 18 64 36 56 52 C 56 52 64 45 66 41 C 66 41 72 54 62 68 C 53 79 38 74 38 60 C 38 48 45 42 45 42 C 45 42 41 46 41 53 C 35 46 44 32 50 18 Z" fill="#fef08a"/>
+  <text x="50" y="88" font-family="sans-serif" font-size="11" font-weight="900" fill="#f97316" text-anchor="middle">FREE FIRE</text>
+</svg>
